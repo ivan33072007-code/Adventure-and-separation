@@ -6,52 +6,64 @@
 <title>Adventure and separation</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; -webkit-tap-highlight-color: transparent; background: #000; }
   
-  #bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #1a1a1a; background-size: cover; background-position: center; transition: background-image 0.8s ease-in-out; z-index: -2; cursor: pointer; }
-  #bg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: -1; pointer-events: none; }
+  /* ФОН */
+  #bg-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: background-image 0.8s ease-in-out; z-index: 0; }
+  #bg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1; pointer-events: none; }
   
-  .book { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; gap: 12px; position: relative; z-index: 1; pointer-events: none; }
+  /* СЛОЙ ДЛЯ КЛИКОВ (пасхалка) */
+  #click-catcher { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; cursor: pointer; }
+
+  /* СТАРТОВОЕ МЕНЮ */
+  #start-menu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; transition: opacity 0.5s; }
+  #start-menu.hidden { opacity: 0; pointer-events: none; }
+  #start-btn { background: rgba(15, 15, 20, 0.85); border: 2px solid #fff; color: #fff; padding: 15px 40px; font-size: 20px; border-radius: 30px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; transition: 0.3s; backdrop-filter: blur(4px); }
+  #start-btn:hover { background: #fff; color: #000; transform: scale(1.05); }
+
+  /* ОСНОВНОЙ ЭКРАН */
+  #main-book { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; gap: 12px; position: relative; z-index: 5; pointer-events: none; opacity: 0; transition: opacity 0.5s; }
+  #main-book.visible { opacity: 1; }
   .page { flex: 1; width: 100%; max-width: 900px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 0; }
   
-  .caption { color: #eee; font-size: clamp(14px, 3.5vw, 18px); text-align: left; width: 100%; max-width: 700px; line-height: 1.6; max-height: 75vh; overflow-y: auto; padding: 20px 24px; background: rgba(15, 15, 20, 0.8); border-radius: 12px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.6); opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: auto; }
+  .caption { color: #eee; font-size: clamp(14px, 3.5vw, 18px); text-align: left; width: 100%; max-width: 700px; line-height: 1.6; max-height: 75vh; overflow-y: auto; padding: 20px 24px; background: rgba(15, 15, 20, 0.85); border-radius: 12px; backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.6); opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: auto; }
   .caption.visible { opacity: 1; transform: translateY(0); }
   .caption::-webkit-scrollbar { width: 6px; }
   .caption::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
   .caption b { color: #fff; }
   .caption i { color: #bbb; }
   
-  .controls { display: flex; align-items: center; gap: 24px; padding-bottom: env(safe-area-inset-bottom); flex-shrink: 0; opacity: 0.2; transition: opacity 0.3s; pointer-events: auto; }
+  .controls { display: flex; align-items: center; gap: 24px; flex-shrink: 0; opacity: 0.2; transition: opacity 0.3s; pointer-events: auto; }
   body:hover .controls, .controls:active { opacity: 1; }
   
-  button { background: rgba(51, 51, 51, 0.8); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; width: 56px; height: 56px; font-size: 24px; cursor: pointer; user-select: none; transition: background 0.15s, transform 0.1s; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+  button { background: rgba(51, 51, 51, 0.8); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; width: 56px; height: 56px; font-size: 24px; cursor: pointer; user-select: none; transition: background 0.15s, transform 0.1s; backdrop-filter: blur(4px); }
   button:hover:not(:disabled) { background: rgba(68, 68, 68, 0.9); }
   button:active:not(:disabled) { transform: scale(0.92); }
   button:disabled { opacity: 0.3; cursor: default; }
-  
   .counter { color: #ccc; font-size: 14px; min-width: 60px; text-align: center; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
   
+  /* КНОПКИ И ПАНЕЛИ В УГЛАХ */
   #music-panel { position: absolute; top: 20px; right: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 10; }
   #music-btn { width: 44px; height: 44px; border-radius: 50%; background: rgba(30, 30, 30, 0.6); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); transition: 0.3s; }
-  #music-btn:hover { background: rgba(60, 60, 60, 0.8); }
-  
   #volume-slider { -webkit-appearance: none; width: 44px; height: 44px; background: rgba(30, 30, 30, 0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 22px; backdrop-filter: blur(4px); cursor: pointer; transform: rotate(-90deg); margin: 40px 0; transition: 0.3s; outline: none; opacity: 0; pointer-events: none; }
   #music-panel:hover #volume-slider, #volume-slider:active { opacity: 1; pointer-events: auto; }
-  #volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
-  #volume-slider::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 5px rgba(0,0,0,0.5); border: none; }
-
+  #volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #fff; }
+  
   #ach-btn { position: absolute; top: 20px; left: 20px; width: 44px !important; height: 44px !important; padding: 0 !important; border-radius: 50% !important; background: rgba(30, 30, 30, 0.6) !important; border: 1px solid rgba(255,255,255,0.2) !important; color: #fff; font-size: 20px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
 
+  /* ОКНО ДОСТИЖЕНИЙ */
   #ach-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 50; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
   .ach-content { background: #1a1a1a; border: 2px solid #f1c40f; border-radius: 12px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; position: relative; }
   .ach-content h2 { color: #f1c40f; text-align: center; margin-bottom: 20px; font-size: 20px; }
   .ach-close { position: absolute; top: 15px; right: 15px; background: none !important; border: none !important; color: #aaa; font-size: 24px; cursor: pointer; width: auto !important; height: auto !important; padding: 0 !important; }
   
-  #achievement-popup { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150%); background: rgba(15, 15, 20, 0.95); border: 2px solid #f1c40f; color: #fff; padding: 15px 30px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.8); z-index: 100; transition: transform 0.4s ease-in-out; text-align: center; backdrop-filter: blur(8px); }
+  /* ВСПЛЫВАШКА */
+  #achievement-popup { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150%); background: rgba(15, 15, 20, 0.95); border: 2px solid #f1c40f; color: #fff; padding: 15px 30px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.8); z-index: 100; transition: transform 0.4s ease-in-out; text-align: center; }
   #achievement-popup.show { transform: translateX(-50%) translateY(0); }
-  #achievement-popup h3 { margin: 0 0 5px 0; color: #f1c40f; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+  #achievement-popup h3 { margin: 0 0 5px 0; color: #f1c40f; font-size: 18px; text-transform: uppercase; }
   #achievement-popup p { margin: 0; font-size: 15px; color: #eee; }
 
+  /* ВЫБОР В СЕКРЕТЕ */
   .choice-container { display: flex; gap: 15px; margin-top: 20px; }
   .choice-btn { background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; text-align: center; transition: 0.2s; user-select: none; }
   .choice-btn:hover { background: rgba(255, 255, 255, 0.3); transform: scale(1.05); }
@@ -68,10 +80,35 @@
 </head>
 <body>
 
-<div id="bg-container" onclick="clickBgEasterEgg()"></div>
+<div id="bg-layer"></div>
 <div id="bg-overlay"></div>
+<div id="click-catcher" onclick="clickBgEasterEgg()"></div>
 
-<button id="ach-btn" onclick="toggleAchievements()">🏆</button>
+<!-- Стартовое меню -->
+<div id="start-menu">
+  <button id="start-btn" onclick="startReading()">Начать историю</button>
+</div>
+
+<!-- Основная книга -->
+<div id="main-book">
+  <button id="ach-btn" onclick="toggleAchievements()">🏆</button>
+  <div id="music-panel">
+    <button id="music-btn" aria-label="Музыка">🎵</button>
+    <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.5" title="Громкость">
+  </div>
+
+  <div class="page">
+    <div class="caption" id="caption"></div>
+  </div>
+  
+  <div class="controls" id="controls">
+    <button id="prev" aria-label="Назад">←</button>
+    <div class="counter" id="counter"></div>
+    <button id="next" aria-label="Вперёд">→</button>
+  </div>
+</div>
+
+<audio id="bg-music" loop></audio>
 
 <div id="ach-modal">
   <div class="ach-content">
@@ -84,24 +121,6 @@
 <div id="achievement-popup">
   <h3 id="ach-title">Достижение</h3>
   <p id="ach-desc">Описание</p>
-</div>
-
-<div id="music-panel">
-  <button id="music-btn" aria-label="Музыка">🎵</button>
-  <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.5" title="Громкость">
-</div>
-
-<audio id="bg-music" loop></audio>
-
-<div class="book">
-  <div class="page" id="page">
-    <div class="caption" id="caption"></div>
-  </div>
-  <div class="controls" id="controls">
-    <button id="prev" aria-label="Назад">←</button>
-    <div class="counter" id="counter"></div>
-    <button id="next" aria-label="Вперёд">→</button>
-  </div>
 </div>
 
 <script>
@@ -198,7 +217,7 @@
 
   function render() {
     const p = pages[current];
-    document.getElementById('bg-container').style.backgroundImage = `url('${p.bg}')`;
+    document.getElementById('bg-layer').style.backgroundImage = `url('${p.bg}')`;
     changeTrack(p.theme);
     captionEl.classList.remove('visible');
     
@@ -337,14 +356,30 @@
     }, 3000);
   }
 
-  // Запуск при загрузке
-  if (pages.length > 0) {
-    const savedPage = localStorage.getItem('bookProgress');
-    if (savedPage !== null && savedPage < pages.length) {
-      current = parseInt(savedPage);
+  // ====== СТАРТ И ФИНАЛ ======
+  function startReading() {
+    // Запускаем музыку при клике
+    bgMusic.play().catch(e => console.log("Ошибка аудио", e));
+    isPlaying = true;
+    musicBtn.textContent = '⏸';
+    musicBtn.style.opacity = '1';
+
+    document.getElementById('start-menu').classList.add('hidden');
+    document.getElementById('main-book').classList.add('visible');
+    
+    // Если это самый первый запуск, то показываем 1-ю страницу
+    if (!localStorage.getItem('bookProgress')) {
+      current = 0;
+    } else {
+      current = parseInt(localStorage.getItem('bookProgress'));
     }
     render();
   }
+
+  // Инициализация стартового меню
+  window.onload = function() {
+    document.getElementById('bg-layer').style.backgroundImage = "url('StartMenu.jpg')";
+  };
 </script>
 </body>
 </html>
