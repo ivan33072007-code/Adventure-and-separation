@@ -12,10 +12,6 @@
   #bg-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: background-image 0.8s ease-in-out; z-index: 0; }
   #bg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1; pointer-events: none; }
 
-  /* СЛОЙ ДЛЯ КЛИКОВ (пасхалка) */
-  #click-catcher { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; cursor: pointer; display: none; }
-  #click-catcher.active { display: block; }
-
   /* СТАРТОВОЕ МЕНЮ */
   #start-menu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; transition: opacity 0.5s; }
   #start-menu.hidden { opacity: 0; pointer-events: none; }
@@ -40,18 +36,18 @@
   .menu-btn:hover { background: #fff; color: #000; transform: scale(1.05); }
 
   /* ОСНОВНОЙ ЭКРАН */
-  #main-book { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; gap: 12px; position: relative; z-index: 5; pointer-events: none; opacity: 0; transition: opacity 0.5s; }
+  #main-book { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; gap: 12px; position: relative; z-index: 5; opacity: 0; transition: opacity 0.5s; }
   #main-book.visible { opacity: 1; }
   .page { flex: 1; width: 100%; max-width: 900px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 0; }
   
-  .caption { color: #eee; font-size: clamp(14px, 3.5vw, 18px); text-align: left; width: 100%; max-width: 700px; line-height: 1.6; max-height: 75vh; overflow-y: auto; padding: 20px 24px; background: rgba(15, 15, 20, 0.85); border-radius: 12px; backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.6); opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: auto; }
+  .caption { color: #eee; font-size: clamp(14px, 3.5vw, 18px); text-align: left; width: 100%; max-width: 700px; line-height: 1.6; max-height: 75vh; overflow-y: auto; padding: 20px 24px; background: rgba(15, 15, 20, 0.85); border-radius: 12px; backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.6); opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; }
   .caption.visible { opacity: 1; transform: translateY(0); }
   .caption::-webkit-scrollbar { width: 6px; }
   .caption::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
   .caption b { color: #fff; }
   .caption i { color: #bbb; }
   
-  .controls { display: flex; align-items: center; gap: 24px; flex-shrink: 0; opacity: 0.2; transition: opacity 0.3s; pointer-events: auto; }
+  .controls { display: flex; align-items: center; gap: 24px; flex-shrink: 0; opacity: 0.2; transition: opacity 0.3s; }
   body:hover .controls, .controls:active { opacity: 1; }
   
   /* ГЛОБАЛЬНЫЕ СТИЛИ ДЛЯ КРУГЛЫХ КНОПОК */
@@ -61,23 +57,23 @@
   button:disabled { opacity: 0.3; cursor: default; }
   .counter { color: #ccc; font-size: 14px; min-width: 60px; text-align: center; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
 
-  /* КНОПКИ И ПАНЕЛИ В УГЛАХ (ПОДНЯТЫ НА САМЫЙ ВЕРХ) */
-  #music-panel { position: absolute; top: 20px; right: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 9999; }
+  /* КНОПКИ И ПАНЕЛИ В УГЛАХ */
+  #music-panel { position: absolute; top: 20px; right: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 10; }
   #music-btn { width: 44px !important; height: 44px !important; border-radius: 50% !important; background: rgba(30, 30, 30, 0.6) !important; border: 1px solid rgba(255,255,255,0.2) !important; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); transition: 0.3s; }
   #volume-slider { -webkit-appearance: none; width: 44px; height: 44px; background: rgba(30, 30, 30, 0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 22px; backdrop-filter: blur(4px); cursor: pointer; transform: rotate(-90deg); margin: 40px 0; transition: 0.3s; outline: none; opacity: 0; pointer-events: none; }
   #music-panel:hover #volume-slider, #volume-slider:active { opacity: 1; pointer-events: auto; }
   #volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #fff; }
   
-  #ach-btn { position: absolute; top: 20px; left: 20px; width: 44px !important; height: 44px !important; padding: 0 !important; border-radius: 50% !important; background: rgba(30, 30, 30, 0.6) !important; border: 1px solid rgba(255,255,255,0.2) !important; color: #fff; font-size: 20px; cursor: pointer; z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  #ach-btn { position: absolute; top: 20px; left: 20px; width: 44px !important; height: 44px !important; padding: 0 !important; border-radius: 50% !important; background: rgba(30, 30, 30, 0.6) !important; border: 1px solid rgba(255,255,255,0.2) !important; color: #fff; font-size: 20px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
 
   /* ОКНО ДОСТИЖЕНИЙ */
-  #ach-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+  #ach-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 50; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
   .ach-content { background: #1a1a1a; border: 2px solid #f1c40f; border-radius: 12px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; position: relative; }
   .ach-content h2 { color: #f1c40f; text-align: center; margin-bottom: 20px; font-size: 20px; }
   .ach-close { position: absolute; top: 15px; right: 15px; background: none !important; border: none !important; color: #aaa; font-size: 24px; cursor: pointer; width: auto !important; height: auto !important; padding: 0 !important; }
   
   /* ВСПЛЫВАШКА */
-  #achievement-popup { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150%); background: rgba(15, 15, 20, 0.95); border: 2px solid #f1c40f; color: #fff; padding: 15px 30px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.8); z-index: 10001; transition: transform 0.4s ease-in-out; text-align: center; }
+  #achievement-popup { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150%); background: rgba(15, 15, 20, 0.95); border: 2px solid #f1c40f; color: #fff; padding: 15px 30px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.8); z-index: 100; transition: transform 0.4s ease-in-out; text-align: center; }
   #achievement-popup.show { transform: translateX(-50%) translateY(0); }
   #achievement-popup h3 { margin: 0 0 5px 0; color: #f1c40f; font-size: 18px; text-transform: uppercase; }
   #achievement-popup p { margin: 0; font-size: 15px; color: #eee; }
@@ -105,7 +101,6 @@
 
 <div id="bg-layer"></div>
 <div id="bg-overlay"></div>
-<div id="click-catcher" onclick="clickBgEasterEgg()"></div>
 
 <!-- Стартовое меню -->
 <div id="start-menu">
@@ -214,7 +209,6 @@
   const bgMusic = document.getElementById('bg-music');
   const musicBtn = document.getElementById('music-btn');
   const volumeSlider = document.getElementById('volume-slider');
-  const clickCatcher = document.getElementById('click-catcher');
   
   let current = 0;
   let isPlaying = false;
@@ -230,8 +224,7 @@
   bgMusic.volume = 0.5;
   volumeSlider.addEventListener('input', (e) => { bgMusic.volume = e.target.value; });
 
-  musicBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
+  musicBtn.addEventListener('click', () => {
     if (isPlaying) {
       bgMusic.pause();
       musicBtn.textContent = '🎵';
@@ -271,8 +264,8 @@
     render();
   }
 
-  prevBtn.addEventListener('click', (e) => { e.stopPropagation(); go(-1); });
-  nextBtn.addEventListener('click', (e) => { e.stopPropagation(); go(1); });
+  prevBtn.addEventListener('click', () => go(-1));
+  nextBtn.addEventListener('click', () => go(1));
   
   document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') go(-1);
@@ -285,8 +278,7 @@
     { id: 2, title: "Первый поцелуй", desc: "Они перестали играть роли." },
     { id: 3, title: "Это было больно", desc: "Вы пережили аварию вместе с Равилем." },
     { id: 4, title: "Любовь — это риск", desc: "Вы дочитали до финала." },
-    { id: 5, title: "👑 Хранитель блокнота", desc: "Вы прочитали всю историю и нашли секрет." },
-    { id: 6, title: "Любопытный нос", desc: "Вы кликнули на машину 5 раз." }
+    { id: 5, title: "👑 Хранитель блокнота", desc: "Вы прочитали всю историю и нашли секрет." }
   ];
 
   let achieved = JSON.parse(localStorage.getItem('bookAchievements')) || [];
@@ -364,40 +356,6 @@
     }, 4000);
   }
 
-  // ====== ПАСХАЛКА НА ФОН ======
-  let clickCount = 0;
-
-  function clickBgEasterEgg() {
-    // Пасхалка работает только в самом конце (Тома 4 и 5)
-    if (current < 17) return; 
-
-    clickCount++;
-    
-    if (clickCount === 5) {
-      showAchievement("Любопытный нос", "Вы кликнули на фон 5 раз и нашли пасхалку!");
-      return;
-    }
-
-    const phrases = [
-      "Егор: — Равиль, перестань тыкать в мою машину!",
-      "Равиль: — Эй, аккуратнее, это X4! Два литра!",
-      "Егор: — Пункт тридцать семь: «Он кликает по машине, когда скучает».",
-      "Нефёд: — А если я сюда петарду кину?..",
-      "Равиль: — Если ты поцарапаешь экран, я тебя сам поцарапаю."
-    ];
-    
-    const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-    
-    const popup = document.getElementById('achievement-popup');
-    document.getElementById('ach-title').textContent = '🚘 Пасхалка';
-    document.getElementById('ach-desc').textContent = randomPhrase;
-    
-    popup.classList.add('show');
-    setTimeout(() => {
-      popup.classList.remove('show');
-    }, 3000);
-  }
-
   // ====== СТАРТ И ФИНАЛ ======
   function startReading() {
     // Запускаем музыку
@@ -409,7 +367,6 @@
 
     document.getElementById('start-menu').classList.add('hidden');
     document.getElementById('main-book').classList.add('visible');
-    clickCatcher.classList.add('active');
     
     if (!localStorage.getItem('bookProgress')) {
       current = 0;
