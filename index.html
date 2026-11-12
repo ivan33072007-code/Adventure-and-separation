@@ -7,29 +7,49 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+  
   #bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: background-image 0.8s ease-in-out; z-index: -2; background-color: #1a1a1a; }
   #bg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: -1; }
   #rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
   .drop { position: absolute; background: rgba(255, 255, 255, 0.15); width: 1px; height: 60px; bottom: 100%; animation: fall linear infinite; }
   @keyframes fall { to { transform: translateY(120vh); } }
+  
   .book { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; gap: 12px; position: relative; z-index: 1; }
   .page { flex: 1; width: 100%; max-width: 900px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 0; }
+  
   .caption { color: #eee; font-size: clamp(14px, 3.5vw, 18px); text-align: left; width: 100%; max-width: 700px; line-height: 1.6; max-height: 75vh; overflow-y: auto; padding: 20px 24px; background: rgba(15, 15, 20, 0.8); border-radius: 12px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.6); opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; }
   .caption.visible { opacity: 1; transform: translateY(0); }
   .caption::-webkit-scrollbar { width: 6px; }
   .caption::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
   .caption b { color: #fff; }
   .caption i { color: #bbb; }
+  
   .controls { display: flex; align-items: center; gap: 24px; padding-bottom: env(safe-area-inset-bottom); flex-shrink: 0; opacity: 0.2; transition: opacity 0.3s; }
   body:hover .controls, .controls:active { opacity: 1; }
+  
   button { background: rgba(51, 51, 51, 0.8); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; width: 56px; height: 56px; font-size: 24px; cursor: pointer; user-select: none; transition: background 0.15s, transform 0.1s; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
   button:hover:not(:disabled) { background: rgba(68, 68, 68, 0.9); }
   button:active:not(:disabled) { transform: scale(0.92); }
   button:disabled { opacity: 0.3; cursor: default; }
+  
   .counter { color: #ccc; font-size: 14px; min-width: 60px; text-align: center; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
-  #music-btn { position: absolute; top: 20px; right: 20px; width: 44px; height: 44px; border-radius: 50%; background: rgba(30, 30, 30, 0.6); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 20px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  
+  #music-panel { position: absolute; top: 20px; right: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 10; }
+  #music-btn { width: 44px; height: 44px; border-radius: 50%; background: rgba(30, 30, 30, 0.6); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); transition: 0.3s; }
   #music-btn:hover { background: rgba(60, 60, 60, 0.8); }
-  @media (max-width: 600px) { button { width: 48px; height: 48px; font-size: 20px; } .caption { max-height: 70vh; padding: 16px; font-size: 15px; } #music-btn { top: 10px; right: 10px; width: 40px; height: 40px; } }
+  
+  #volume-slider { -webkit-appearance: none; width: 44px; height: 44px; background: rgba(30, 30, 30, 0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 22px; backdrop-filter: blur(4px); cursor: pointer; transform: rotate(-90deg); margin: 40px 0; transition: 0.3s; outline: none; opacity: 0; pointer-events: none; }
+  #music-panel:hover #volume-slider, #volume-slider:active { opacity: 1; pointer-events: auto; }
+  #volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+  #volume-slider::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 5px rgba(0,0,0,0.5); border: none; }
+
+  @media (max-width: 600px) { 
+    button { width: 48px; height: 48px; font-size: 20px; } 
+    .caption { max-height: 70vh; padding: 16px; font-size: 15px; } 
+    #music-panel { top: 10px; right: 10px; }
+    #music-btn { width: 40px; height: 40px; }
+    #volume-slider { width: 40px; height: 40px; margin: 35px 0; opacity: 1; pointer-events: auto; }
+  }
 </style>
 </head>
 <body>
@@ -38,7 +58,11 @@
 <div id="bg-overlay"></div>
 <div id="rain"></div>
 
-<button id="music-btn" aria-label="Музыка">🎵</button>
+<div id="music-panel">
+  <button id="music-btn" aria-label="Музыка">🎵</button>
+  <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.5" title="Громкость">
+</div>
+
 <audio id="bg-music" loop></audio>
 
 <div class="book">
@@ -61,179 +85,25 @@
   };
 
   const pages = [
-    {
-      bg: "bg.jpg", theme: "calm",
-      caption: `<b>ГЛАВА 1. «Список, который всё изменил»</b><br><br><i>Комната Егора. Ночь. На столе — тот самый блокнот. Равиль листает его, пока Егор спит на диване.</i><br><br><b>Равиль</b> <i>(шёпотом, читая):</i> — «Пункт семь: когда он смеётся, я забываю, что хотел написать»… Егор, ты серьёзно?<br><br><i>Крупный план — рука Егора во сне сжимает край пледа. Равиль смотрит на него дольше, чем собирался.</i><br><br><b>Равиль</b> <i>(про себя):</i> — Вот чёрт.`
-    },
-    {
-      bg: "bg-kitchen.jpg", theme: "calm",
-      caption: `<b>ГЛАВА 2. «Утро, которое стало другим»</b><br><br><i>Кухня. Егор в помятой футболке варит кофе. Равиль стоит в дверях, взъерошенный, без геля — впервые за весь том.</i><br><br><b>Егор</b> <i>(не оборачиваясь):</i> — Ты всю ночь читал мой блокнот?<br><br><b>Равиль</b> <i>(голос садится):</i> — Ты не спал?<br><br><b>Егор</b> <i>(поворачивается, кружка в руках):</i> — Спал. Просто чувствую, когда на меня смотрят. Особенно ты.<br><br><i>Пауза. Пар от кофе между ними. Равиль делает шаг.</i><br><br><b>Равиль:</b> — Егор. Пункт семь. Это про меня?<br><br><b>Егор</b> <i>(отводит взгляд, уши краснеют):</i> — Это про математику.<br><br><b>Равиль:</b> — В пункте семь написано «когда он смеётся». Математика не смеётся, Безбородов.<br><br><i>Егор ставит кружку. Слишком резко. Кофе плещется.</i>`
-    },
-    {
-      bg: "bg-car.jpg", theme: "calm",
-      caption: `<b>ГЛАВА 3. «X4 как предлог»</b><br><br><i>BMW стоит во дворе. Равиль крутит ключи на пальце.</i><br><br><b>Равиль</b> <i>(стараясь звучать буднично):</i> — Подвезти?<br><br><b>Егор:</b> — Мы живём в одном дворе.<br><br><b>Равиль:</b> — Ну и что. Может, я хочу прокатить тебя. На переднем сиденье.<br><br><i>Егор замирает. Смотрит на него.</i><br><br><b>Егор:</b> — Равиль. Ты два месяца сажал туда только себя и свои понты.<br><br><b>Равиль</b> <i>(тихо):</i> — А теперь хочу тебя.<br><br><i>Лицо Егора. Глаза расширяются. Он открывает рот, закрывает.</i><br><br><b>Егор:</b> — …Ты это сейчас серьёзно сказал?<br><br><b>Равиль</b> <i>(краснеет, отворачивается):</i> — Забей. Садись уже.<br><br><i>Егор садится. Впервые — не потому что деваться некуда.</i>`
-    },
-    {
-      bg: "bg-car.jpg", theme: "calm",
-      caption: `<b>ГЛАВА 4. «Ночная трасса»</b><br><br><i>Пустая дорога, огни города. Музыка тихо. Равиль ведёт одной рукой. Егор смотрит в окно, потом на него.</i><br><br><b>Егор:</b> — Ты знаешь, почему я вообще сел в эту машину в первый раз?<br><br><b>Равиль:</b> — Потому что я тебя заставил?<br><br><b>Егор</b> <i>(усмехается):</i> — Потому что ты ждал меня у подъезда сорок минут. И делал вид, что просто мимо проезжал.<br><br><i>Равиль резко тормозит на светофоре. Поворачивается.</i><br><br><b>Равиль:</b> — Ты знал?<br><br><b>Егор:</b> — Я всё знаю. Я же веду блокнот.<br><br><i>Они смотрят друг на друга. Красный свет. Никто не торопится ехать.</i><br><br><b>Егор</b> <i>(тише):</i> — Пункт двенадцать. «Он смотрит на меня, когда думает, что я не вижу». Я вижу, Равиль.`
-    },
-    {
-      bg: "bg-car.jpg", theme: "calm",
-      caption: `<b>ГЛАВА 5. «Переднее сиденье»</b><br><br><i>Машина припаркована у дома. Двигатель заглушён. Тишина. Равиль сжимает руль.</i><br><br><b>Равиль:</b> — Егор. Я не знаю, как это делается. Я умею только понтоваться. Скажи мне, что делать.<br><br><b>Егор</b> <i>(отстёгивает ремень, поворачивается к нему):</i> — Не понтуйся. Просто будь.<br><br><i>Равиль медленно убирает руку с руля. Поворачивается. Их лица близко.</i><br><br><b>Равиль</b> <i>(шёпотом):</i> — Я боюсь, что ты сейчас скажешь «это шутка».<br><br><b>Егор:</b> — Это не шутка.<br><br><i>Егор первым тянется. Целует — коротко, неуверенно. Равиль замирает на секунду. Потом отвечает — уже без понтов.</i>`
-    },
-    {
-      bg: "bg-kitchen.jpg", theme: "calm",
-      caption: `<b>ГЛАВА 6. «Диплом»</b><br><br><i>Утро. Кухня Егора. Равиль в его футболке пьёт кофе. На столе — блокнот. Егор дописывает последнюю страницу.</i><br><br><b>Равиль</b> <i>(зевая):</i> — Что пишешь?<br><br><b>Егор:</b> — Заключение. «Вывод: пациент безнадёжен. Но я его вылечил».<br><br><b>Равиль</b> <i>(поперхнулся):</i> — Ты… ты серьёзно вставил меня в диплом?!<br><br><b>Егор</b> <i>(ухмыляется):</i> — Глава десять. «Метод лечения: совместные поездки на X4 и честные разговоры». Оценка — отлично.<br><br><i>Равиль тянется через стол, хватает Егора за футболку, притягивает.</i><br><br><b>Равиль:</b> — А за «пациента» я тебе сейчас устрою.<br><br><i>Поцелуй. Блокнот падает на пол. Кофе остывает.</i><br><br><b>Егор</b> <i>(между поцелуями):</i> — Пункт тринадцать… «он целуется лучше, чем паркуется»…<br><br><b>Равиль:</b> — Заткнись, Безбородов.`
-    },
-    {
-      bg: "bg-final.jpg", theme: "epic",
-      caption: `<b>ФИНАЛЬНАЯ ПАНЕЛЬ (ТОМ 2)</b><br><br><i>BMW у колледжа. Из машины выходят двое. Равиль — без очков. Егор — с блокнотом под мышкой.</i><br><br><b>Девушка:</b> — О, у тебя X4? Круто!<br><br><b>Равиль</b> <i>(берёт Егора за руку):</i> — Ага. И самый крутой пассажир. Пойдём, Егор.<br><br><i>Егор улыбается. Первый раз за весь том — открыто, не пряча.</i><br><br><b>Егор</b> <i>(закадровый):</i> — Пункт четырнадцатый. «Он наконец назвал меня пассажиром. Не другом. Не соседом. Пассажиром переднего сиденья».<br><br><b>КОНЕЦ ВТОРОГО ТОМА</b>`
-    }
-  ];
+    // --- ТОМ 1 ---
+    { theme: "calm", caption: `<b>ТОМ 1. ГЛАВА 1. «Чёрный X4 и пустое пассажирское сиденье»</b><br><br><i>Огромный чёрный BMW X4 с тонировкой в ноль плавно паркуется у входа в колледж. Открывается дверь. Выходит Равиль — в солнечных очках, с цепочкой поверх чёрной водолазки.</i><br><br><b>Равиль</b> <i>(в пустоту, поправляя очки):</i> — Ну что, красавчик. Сегодня точно. Сегодня какая-то заметит.<br><br><i>Камера отъезжает — на пассажирском сиденье сидит Егор Безбородов. Обычные кроссовки, помятая футболка, рюкзак с учебниками.</i><br><br><b>Егор</b> <i>(жуёт бутерброд):</i> — Ты уже сорок минут круги нарезаешь вокруг колледжа. Люди думают, ты такси.<br><br><b>Равиль</b> <i>(резко оборачивается):</i> — Это не такси! Это X4! Два литра, полный привод, я на него полгода копил!<br><br><b>Егор</b> <i>(спокойно):</i> — Ага. И за это время ни одна девушка в него не села.<br><br><i>Крупный план лица Равиля. Глаз дёргается.</i><br><br><b>Равиль</b> <i>(сквозь зубы):</i> — Зато они СМОТРЯТ.<br><br><b>Егор:</b> — Смотрят, как ты в третий раз не можешь запарковаться между линиями.` },
+    { theme: "calm", caption: `<b>ГЛАВА 2. «Теория Егора»</b><br><br><i>Крыша BMW. Равиль и Егор сидят на капоте. Равиль листает телефон, его лицо в свете экрана.</i><br><br><b>Равиль</b> <i>(обречённо):</i> — Я написал семи. СЕМИ. Всем «привет, как дела». Три прочитали, две ответили «привет», одна — «ты кто?». Одна спросила, не её ли это парень по фотке профиля.<br><br><b>Егор:</b> — А ты что ответил?<br><br><b>Равиль:</b> — Сказал, что у меня BMW X4.<br><br><i>Пауза. Егор медленно поворачивает голову.</i><br><br><b>Егор:</b> — Равиль. Ты серьёзно ответил ей про машину?<br><br><b>Равиль</b> <i>(уверенно):</i> — Ну а что? Девушки любят успешных.<br><br><b>Егор</b> <i>(закрывает лицо руками):</i> — Девушки любят, когда с ними разговаривают как с людьми. А ты им продаёшь себя как объявление на Авито: «BMW X4, не бит, не крашен, хозяин адекватный».<br><br><b>Равиль:</b> — И что, по-твоему, я делаю не так?!<br><br><i>Егор достаёт из рюкзака блокнот. Открывает. Там список.</i><br><br><b>Егор:</b> — Я за тобой наблюдаю два месяца. Пишу диплом. «Почему Равиль один». Пункт один: ты подъезжаешь к людям так, будто тебя снимают в клипе. Пункт два: ты вставляешь «у меня X4» в каждый разговор. Даже когда спрашивают, сколько времени.<br><br><b>Равиль:</b> — Это контекст!<br><br><b>Егор:</b> — Пункт три: ты однажды сказал девушке, что твоя машина «с характером», и она подумала, что ты про бывшую.` },
+    { theme: "calm", caption: `<b>ГЛАВА 3. «Попытка номер восемь»</b><br><br><i>Кофейня у колледжа. Равиль в идеальной позе у окна. За столиком — девушка с книгой. Равиль подходит.</i><br><br><b>Равиль</b> <i>(отрепетированным тоном):</i> — Привет. Не видел тебя раньше. Я Равиль. У меня, кстати, X4.<br><br><b>Девушка</b> <i>(поднимает глаза):</i> — Что?<br><br><b>Равиль:</b> — Ну, машина. BMW X4. Чёрная.<br><br><b>Девушка</b> <i>(медленно):</i> — Я спросила, не видел ли ты, где здесь розетка. У меня ноут сел.<br><br><i>За соседним столиком Егор давится кофе. Равиль застыл, как статуя.</i><br><br><b>Егор</b> <i>(подходит, кладёт руку Равилю на плечо):</i> — Пойдём, легенда. Розетку искать.` },
+    { theme: "calm", caption: `<b>ГЛАВА 4. «Двор, вечер, честный разговор»</b><br><br><i>Двор, сумерки. BMW стоит. Равиль сидит на бордюре, сняв очки. Впервые без понтов.</i><br><br><b>Равиль</b> <i>(тихо):</i> — Егор. А может, дело реально во мне, а не в машине?<br><br><b>Егор</b> <i>(садится рядом):</i> — Может. Слушай. Ты не плохой. Ты просто… играешь роль. А девушки чувствуют фальшь быстрее, чем ты успеваешь нажать на газ.<br><br><b>Равиль:</b> — Но у меня же всё есть. Деньги, тачка. Чего им ещё надо?<br><br><b>Егор:</b> — Чтобы ты спросил, как у НИХ дела. Не как у них дела с твоей тачкой. А просто — как дела.<br><br><i>Равиль молчит. Смотрит на свой BMW. Впервые машина кажется ему просто большой чёрной штукой с четырьмя колёсами.</i><br><br><b>Равиль:</b> — …А ты бы что сказал девушке?<br><br><b>Егор:</b> — «Привет. Я Егор. Люблю математику и шаурму». И всё.<br><br><b>Равиль</b> <i>(фыркает):</i> — И это работает?<br><br><b>Егор:</b> — Ну, у меня-то тоже никого нет. Но я хотя бы не притворяюсь.<br><br><i>Оба смеются. Первый честный смех за весь том.</i>` },
+    { theme: "calm", caption: `<b>ГЛАВА 5. «Маленькая победа»</b><br><br><i>Следующий день. Равиль подходит к однокурснице — обычной, веснушки, рюкзак с значками.</i><br><br><b>Равиль</b> <i>(волнуясь, без очков):</i> — Привет. Эм. Я Равиль. Слушай, ты вчера на лекции так ответила про эту формулу… Я вообще не понял. Можешь объяснить?<br><br><i>Лицо Егора вдалеке — брови подняты. Он медленно показывает большой палец.</i><br><br><b>Девушка</b> <i>(улыбается):</i> — О, это просто. Садись, покажу.<br><br><i>Равиль садится. На лице — растерянность и облегчение. За кадром голос Егора:</i><br><br><b>Егор</b> <i>(закадровый):</i> — В этот момент Равиль впервые за два месяца не упомянул X4. И знаете что? Ему даже понравилось.<br><br><i>Вечер, BMW уезжает. В салоне двое. Егор листает блокнот.</i><br><br><b>Равиль:</b> — Егор.<br><br><b>Егор:</b> — Что.<br><br><b>Равиль:</b> — Спасибо. Только не записывай это в диплом.<br><br><b>Егор</b> <i>(пишет):</i> — Поздно. Глава девять: «Пациент начал говорить о чувствах».<br><br><i>Равиль бьёт его по плечу. Машина уезжает в закат.</i><br><br><b>КОНЕЦ ПЕРВОГО ТОМА</b>` },
 
-  const captionEl = document.getElementById('caption');
-  const counterEl = document.getElementById('counter');
-  const prevBtn = document.getElementById('prev');
-  const nextBtn = document.getElementById('next');
-  const pageEl = document.getElementById('page');
-  const bgContainer = document.getElementById('bg-container');
-  const musicBtn = document.getElementById('music-btn');
-  const bgMusic = document.getElementById('bg-music');
-  
-  let current = 0;
-  let audioCtx = null;
-  let isPlaying = false;
-  let currentTheme = 'calm';
+    // --- ТОМ 2 ---
+    { theme: "calm", caption: `<b>ТОМ 2. ГЛАВА 1. «Список, который всё изменил»</b><br><br><i>Комната Егора. Ночь. На столе — тот самый блокнот. Равиль листает его, пока Егор спит на диване.</i><br><br><b>Равиль</b> <i>(шёпотом, читая):</i> — «Пункт семь: когда он смеётся, я забываю, что хотел написать»… Егор, ты серьёзно?<br><br><i>Крупный план — рука Егора во сне сжимает край пледа. Равиль смотрит на него дольше, чем собирался.</i><br><br><b>Равиль</b> <i>(про себя):</i> — Вот чёрт.` },
+    { theme: "calm", caption: `<b>ГЛАВА 2. «Утро, которое стало другим»</b><br><br><i>Кухня. Егор в помятой футболке варит кофе. Равиль стоит в дверях, взъерошенный, без геля — впервые за весь том.</i><br><br><b>Егор</b> <i>(не оборачиваясь):</i> — Ты всю ночь читал мой блокнот?<br><br><b>Равиль</b> <i>(голос садится):</i> — Ты не спал?<br><br><b>Егор</b> <i>(поворачивается, кружка в руках):</i> — Спал. Просто чувствую, когда на меня смотрят. Особенно ты.<br><br><i>Пауза. Пар от кофе между ними. Равиль делает шаг.</i><br><br><b>Равиль:</b> — Егор. Пункт семь. Это про меня?<br><br><b>Егор</b> <i>(отводит взгляд, уши краснеют):</i> — Это про математику.<br><br><b>Равиль:</b> — В пункте семь написано «когда он смеётся». Математика не смеётся, Безбородов.<br><br><i>Егор ставит кружку. Слишком резко. Кофе плещется.</i>` },
+    { theme: "calm", caption: `<b>ГЛАВА 3. «X4 как предлог»</b><br><br><i>BMW стоит во дворе. Равиль крутит ключи на пальце.</i><br><br><b>Равиль</b> <i>(стараясь звучать буднично):</i> — Подвезти?<br><br><b>Егор:</b> — Мы живём в одном дворе.<br><br><b>Равиль:</b> — Ну и что. Может, я хочу прокатить тебя. На переднем сиденье.<br><br><i>Егор замирает. Смотрит на него.</i><br><br><b>Егор:</b> — Равиль. Ты два месяца сажал туда только себя и свои понты.<br><br><b>Равиль</b> <i>(тихо):</i> — А теперь хочу тебя.<br><br><i>Лицо Егора. Глаза расширяются. Он открывает рот, закрывает.</i><br><br><b>Егор:</b> — …Ты это сейчас серьёзно сказал?<br><br><b>Равиль</b> <i>(краснеет, отворачивается):</i> — Забей. Садись уже.<br><br><i>Егор садится. Впервые — не потому что деваться некуда.</i>` },
+    { theme: "calm", caption: `<b>ГЛАВА 4. «Ночная трасса»</b><br><br><i>Пустая дорога, огни города. Музыка тихо. Равиль ведёт одной рукой. Егор смотрит в окно, потом на него.</i><br><br><b>Егор:</b> — Ты знаешь, почему я вообще сел в эту машину в первый раз?<br><br><b>Равиль:</b> — Потому что я тебя заставил?<br><br><b>Егор</b> <i>(усмехается):</i> — Потому что ты ждал меня у подъезда сорок минут. И делал вид, что просто мимо проезжал.<br><br><i>Равиль резко тормозит на светофоре. Поворачивается.</i><br><br><b>Равиль:</b> — Ты знал?<br><br><b>Егор:</b> — Я всё знаю. Я же веду блокнот.<br><br><i>Они смотрят друг на друга. Красный свет. Никто не торопится ехать.</i><br><br><b>Егор</b> <i>(тише):</i> — Пункт двенадцать. «Он смотрит на меня, когда думает, что я не вижу». Я вижу, Равиль.` },
+    { theme: "calm", caption: `<b>ГЛАВА 5. «Переднее сиденье»</b><br><br><i>Машина припаркована у дома. Двигатель заглушён. Тишина. Равиль сжимает руль.</i><br><br><b>Равиль:</b> — Егор. Я не знаю, как это делается. Я умею только понтоваться. Скажи мне, что делать.<br><br><b>Егор</b> <i>(отстёгивает ремень, поворачивается к нему):</i> — Не понтуйся. Просто будь.<br><br><i>Равиль медленно убирает руку с руля. Поворачивается. Их лица близко.</i><br><br><b>Равиль</b> <i>(шёпотом):</i> — Я боюсь, что ты сейчас скажешь «это шутка».<br><br><b>Егор:</b> — Это не шутка.<br><br><i>Егор первым тянется. Целует — коротко, неуверенно. Равиль замирает на секунду. Потом отвечает — уже без понтов.</i>` },
+    { theme: "calm", caption: `<b>ГЛАВА 6. «Диплом»</b><br><br><i>Утро. Кухня Егора. Равиль в его футболке пьёт кофе. На столе — блокнот. Егор дописывает последнюю страницу.</i><br><br><b>Равиль</b> <i>(зевая):</i> — Что пишешь?<br><br><b>Егор:</b> — Заключение. «Вывод: пациент безнадёжен. Но я его вылечил».<br><br><b>Равиль</b> <i>(поперхнулся):</i> — Ты… ты серьёзно вставил меня в диплом?!<br><br><b>Егор</b> <i>(ухмыляется):</i> — Глава десять. «Метод лечения: совместные поездки на X4 и честные разговоры». Оценка — отлично.<br><br><i>Равиль тянется через стол, хватает Егора за футболку, притягивает.</i><br><br><b>Равиль:</b> — А за «пациента» я тебе сейчас устрою.<br><br><i>Поцелуй. Блокнот падает на пол. Кофе остывает.</i><br><br><b>Егор</b> <i>(между поцелуями):</i> — Пункт тринадцать… «он целуется лучше, чем паркуется»…<br><br><b>Равиль:</b> — Заткнись, Безбородов.` },
+    { theme: "epic", caption: `<b>ФИНАЛЬНАЯ ПАНЕЛЬ (ТОМ 2)</b><br><br><i>BMW у колледжа. Из машины выходят двое. Равиль — без очков. Егор — с блокнотом под мышкой.</i><br><br><b>Девушка:</b> — О, у тебя X4? Круто!<br><br><b>Равиль</b> <i>(берёт Егора за руку):</i> — Ага. И самый крутой пассажир. Пойдём, Егор.<br><br><i>Егор улыбается. Первый раз за весь том — открыто, не пряча.</i><br><br><b>Егор</b> <i>(закадровый):</i> — Пункт четырнадцатый. «Он наконец назвал меня пассажиром. Не другом. Не соседом. Пассажиром переднего сиденья».<br><br><b>КОНЕЦ ВТОРОГО ТОМА</b>` },
 
-  // Дождь
-  function createRain() {
-    const rainContainer = document.getElementById('rain');
-    for (let i = 0; i < 40; i++) {
-      const drop = document.createElement('div');
-      drop.className = 'drop';
-      drop.style.left = Math.random() * 100 + '%';
-      drop.style.animationDuration = (Math.random() * 0.5 + 0.5) + 's';
-      drop.style.animationDelay = (Math.random() * 2) + 's';
-      drop.style.opacity = Math.random() * 0.3 + 0.1;
-      rainContainer.appendChild(drop);
-    }
-  }
-  createRain();
-
-  // Музыка
-  function changeTrack(theme) {
-    if (currentTheme === theme && isPlaying) return;
-    currentTheme = theme;
-    bgMusic.src = audioSources[theme];
-    if (isPlaying) bgMusic.play().catch(e => {});
-  }
-
-  musicBtn.addEventListener('click', () => {
-    if (isPlaying) {
-      bgMusic.pause();
-      musicBtn.textContent = '🎵';
-      musicBtn.style.opacity = '0.5';
-    } else {
-      bgMusic.play().catch(e => console.log("Ошибка аудио", e));
-      musicBtn.textContent = '⏸';
-      musicBtn.style.opacity = '1';
-    }
-    isPlaying = !isPlaying;
-  });
-  musicBtn.style.opacity = '0.5';
-
-  // Звук страниц
-  function playFlipSound() {
-    try {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const bufferSize = audioCtx.sampleRate * 0.1;
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-      const noise = audioCtx.createBufferSource();
-      noise.buffer = buffer;
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(1000, audioCtx.currentTime);
-      filter.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
-      const gain = audioCtx.createGain();
-      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-      noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
-      noise.start();
-    } catch (e) {}
-  }
-
-  let typeTimeout;
-  function typeWriter(html) {
-    clearTimeout(typeTimeout);
-    captionEl.innerHTML = '';
-    captionEl.classList.add('visible');
-    const tokens = html.match(/(<[^>]+>|&[^;]+;|.)/g) || [];
-    let i = 0;
-    function type() {
-      if (i < tokens.length) {
-        captionEl.innerHTML += tokens[i];
-        captionEl.scrollTop = captionEl.scrollHeight;
-        i++;
-        typeTimeout = setTimeout(type, 15);
-      }
-    }
-    type();
-  }
-
-  captionEl.addEventListener('click', () => {
-    if (typeTimeout) {
-      clearTimeout(typeTimeout);
-      typeTimeout = null;
-      captionEl.innerHTML = pages[current].caption;
-    }
-  });
-
-  function render() {
-    const p = pages[current];
-    bgContainer.style.backgroundImage = `url('${p.bg}')`;
-    changeTrack(p.theme);
-    captionEl.classList.remove('visible');
-    
-    setTimeout(() => {
-      typeWriter(p.caption);
-      counterEl.textContent = (current + 1) + " / " + pages.length;
-      prevBtn.disabled = current === 0;
-      nextBtn.disabled = current === pages.length - 1;
-    }, 150);
-  }
-
-  function go(delta) {
-    const next = current + delta;
-    if (next < 0 || next >= pages.length) return;
-    playFlipSound();
-    current = next;
-    render();
-  }
-
-  prevBtn.addEventListener('click', () => go(-1));
-  nextBtn.addEventListener('click', () => go(1));
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft') go(-1);
-    if (e.key === 'ArrowRight') go(1);
-  });
-
-  let touchStartX = null;
-  pageEl.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
-  pageEl.addEventListener('touchend', (e) => {
-    if (touchStartX === null) return;
-    const dx = e.changedTouches[0].clientX - touchStartX;
-    if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
-    touchStartX = null;
-  });
-
-  if (pages.length > 0) {
-    bgContainer.style.backgroundImage = `url('${pages[0].bg}')`;
-    counterEl.textContent = "1 / " + pages.length;
-    prevBtn.disabled = true;
-    setTimeout(() => typeWriter(pages[0].caption), 100);
-  }
-</script>
-</body>
-</html>
+    // --- ТОМ 3 ---
+    { theme: "tense", caption: `<b>ТОМ 3. ГЛАВА 1. «Минус на карте»</b><br><br><i>Равиль в BMW, листает банковское приложение. Экран: −47 000 ₽. Лицо каменеет.</i><br><br><b>Равиль</b> <i>(в трубку, орёт):</i> — В смысле «отец больше не переводит»?! На что я X4 заправляю?!<br><br><i>Он выходит, хлопает дверью — сигнализация воет. Егор выходит из подъезда.</i><br><br><b>Егор:</b> — Ты чего сигнализацию...<br><br><b>Равиль</b> <i>(рявкает):</i> — Отвали, Безбородов! Тебе вообще похуй, у тебя мать-училка!<br><br><i>Егор замирает. Медленно закрывает учебник.</i><br><br><b>Егор</b> <i>(тихо, но с нажимом):</i> — Ты сейчас мою маму тронул. Ещё раз — и я тебе лицо испорчу.<br><br><b>Равиль:</b> — Да что ты сделаешь, умник?! Формулу мне напишешь?!<br><br><i>Они стоят нос к носу. Первый раз — по-настоящему злые.</i>` },
+    { theme: "tense", caption: `<b>ГЛАВА 2. «Шелуха»</b><br><br><i>Кафе. За столиком — Арина («Шелуха»), жвачка, телефон, ноль интереса к миру.</i><br><br><b>Равиль</b> <i>(садится напротив):</i> — Арин. Мне нужно перезанять. Тысяч двадцать. Верну с процентами.<br><br><b>Арина</b> <i>(не поднимая глаз):</i> — Равиль. Иди нахуй.<br><br><b>Равиль:</b> — Ну серьёзно, у меня временно...<br><br><b>Арина:</b> — Я сказала: иди. Нахуй. Ты глухой или понты уши заложили?<br><br><i>Равиль застыл с открытым ртом.</i><br><br><b>Равиль</b> <i>(себе под нос):</i> — Она кокетничает. Точно. Это такой флирт.<br><br><b>Егор</b> <i>(закадровый):</i> — Пункт двадцать. «Он не понимает слова "нет". Он думает, что это приглашение поторговаться».` },
+    { theme: "calm", caption: `<b>ГЛАВА 3. «Паша и Нефёд»</b><br><br><i>Двор. Паша — качок в трениках — наезжает на Равиля.</i><br><br><b>Паша:</b> — Равиль, ты мне должен за шаурму! Две недели назад! Я тебя порву!<br><br><b>Равиль</b> <i>(устало):</i> — Паш, у меня правда сейчас...<br><br><i>Паша замахивается... и просто поправляет Равилю воротник.</i><br><br><b>Паша:</b> — Ну ладно. В следующий раз. Пошли, что ли, в танки?<br><br><i>Рядом появляется Нефёд — 15 лет, глаза горят, в руках петарда.</i><br><br><b>Нефёд:</b> — РАВИЛЬ! Я нашёл заброшку! Там можно всё сжечь!<br><br><b>Равиль:</b> — Нефёд, тебе пятнадцать.<br><br><b>Нефёд:</b> — И что?! Годы — это цифры! Пошли!` },
+    { theme: "calm", caption: `<b>ГЛАВА 4. «Танки и удача»</b><br><br><i>Комната Равиля. Ночь. Он в наушниках. Танки. Победа.</i><br><br><b>Равиль</b> <i>(орёт в чат):</i> — СТО К ЭЛО! СТО! Я ВЕЗУЧИЙ, Я БОГ!<br><br><i>На экране — сундук. 100 000 золота.</i><br><br><b>Равиль:</b> — Почему в танках мне так везёт... а в жизни нет.<br><br><i>Он переключается на CS2. Проигрыш. Ещё проигрыш.</i><br><br><b>Равиль</b> <i>(в чат):</i> — Тиммейты — мусор! Все мусор! Матери ваши...<br><br><i>Он замирает. Только что он сказал то, за что сам готов был убить Егора.</i>` },
+    { theme: "tense", caption: `<b>ГЛАВА 5. «Разлука №1»</b><br><br><i>Колледж. Равиль идёт по коридору. Навстречу — Егор с Мишей и Ваней.</i><br><br><b>Ваня</b> <i>(тихо Егору):</i> — Это же он тебе про мать сказал?<br><br><b>Егор:</b> — Он.<br><br><b>Миша:</b> — Хочешь, я с ним поговорю? У нас на районе быстро решается.<br><br><b>Егор:</b> — Не надо. Он сам себя накажет.<br><br><i>Равиль проходит мимо. Никто не здоровается.</i><br><br><b>Егор</b
