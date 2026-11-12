@@ -46,27 +46,27 @@
     #music-panel { top: 10px; right: 10px; }
     #music-btn { width: 40px; height: 40px; }
     #volume-slider { width: 40px; height: 40px; margin: 35px 0; opacity: 1; pointer-events: auto; }
-       .choice-container {
+         .choice-container {
     display: flex;
-    gap: 10px;
-    margin-top: 15px;
+    gap: 15px;
+    margin-top: 20px;
   }
 
   .choice-btn {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    color: #fff !important;
-    padding: 10px 20px !important;
-    border-radius: 8px !important;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 16px !important;
-    width: auto !important;
-    height: auto !important;
+    font-size: 16px;
+    text-align: center;
     transition: 0.2s;
+    user-select: none;
   }
   
   .choice-btn:hover {
-    background: rgba(255, 255, 255, 0.3) !important;
+    background: rgba(255, 255, 255, 0.3);
     transform: scale(1.05);
   }
 </style>
@@ -144,8 +144,8 @@
     { bg: "bg-final.jpg", theme: "calm2", caption: `<b>БОНУС-СЦЕНА</b><br><br><i>Нефёд всё-таки взорвал петарду во дворе. Паша его «порвал» (то есть отругал и купил мороженое). Арина послала Равиля нахуй ещё три раза — просто так, для профилактики. Миша вышел из «Нового быта» погулять с девушкой. Ваня сделал реп про X4. Егор дописал блокнот до конца. Равиль перестал считать, что деньги решают всё.</i><br><br><b>Пункт тридцать пятый:</b> «Он наконец понял, что самое ценное — не в машине».` },
     { bg: "bg.jpg", theme: "epic", caption: `<b>СЕКРЕТНАЯ ПАНЕЛЬ</b><br><br><i>Вы дочитали до конца. Вы знаете, что было дальше?</i><br><br>
     <div class="choice-container">
-      <button class="choice-btn" onclick="chooseSecret('yes')">Да, конечно</button>
-      <button class="choice-btn" onclick="chooseSecret('no')">Нет, не знаю</button>
+      <div class="choice-btn" onclick="chooseSecret('yes')">Да, конечно</div>
+      <div class="choice-btn" onclick="chooseSecret('no')">Нет, не знаю</div>
     </div>` }
   ];
   const captionEl = document.getElementById('caption');
