@@ -6,7 +6,7 @@
 <title>Adventure and separation</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; -webkit-tap-highlight-color: transparent;}
   
   #bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #1a1a1a; background-size: cover; background-position: center; transition: background-image 0.8s ease-in-out; z-index: -2; }
   #bg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: -1; }
@@ -69,9 +69,46 @@
     background: rgba(255, 255, 255, 0.3);
     transform: scale(1.05);
   }
+     /* Уведомления о достижениях */
+  #achievement-popup {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-150%);
+    background: rgba(30, 30, 30, 0.95);
+    border: 2px solid #f1c40f;
+    color: #fff;
+    padding: 15px 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+    z-index: 100;
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-align: center;
+    backdrop-filter: blur(5px);
+  }
+  #achievement-popup.show {
+    transform: translateX(-50%) translateY(0);
+  }
+  #achievement-popup h3 {
+    margin: 0 0 5px 0;
+    color: #f1c40f;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  #achievement-popup p {
+    margin: 0;
+    font-size: 14px;
+    color: #ccc;
+  }
 </style>
 </head>
 <body>
+
+ <div id="achievement-popup">
+  <h3 id="ach-title">Достижение</h3>
+  <p id="ach-desc">Описание</p>
+</div>
 
 <div id="bg-container"></div>
 <div id="bg-overlay"></div>
@@ -160,12 +197,16 @@
   let isPlaying = false;
   let currentTheme = 'calm';
 
-   function chooseSecret(choice) {
+     function chooseSecret(choice) {
     const p = pages[current];
     if (choice === 'yes') {
-      p.caption = `<b>СЕКРЕТНАЯ ПАНЕЛЬ</b><br><br><i>Вы дочитали до конца. Вы знаете, что было дальше?</i><br><br><b>Егор</b> <i>(пишет в блокноте):</i> — Пункт тридцать шестой. «Он дочитал до конца. Значит, ему не всё равно».<br><br><b>Равиль</b> <i>(заглядывает через плечо):</i> — Ты опять пишешь про меня?<br><br><b>Егор:</b> — Нет. Это про меня.<br><br><b>КОНЕЦ ВСЕХ ИСТОРИЙ</b>`;
+      p.caption = `<b>СЕКРЕТНАЯ ПАНЕЛЬ</b><br><br><b>Егор</b> <i>(пишет в блокноте):</i> — Пункт тридцать шестой. «Он дочитал до конца. Значит, ему не всё равно».<br><br><b>Равиль</b> <i>(заглядывает через плечо):</i> — Ты опять пишешь про меня?<br><br><b>Егор:</b> — Нет. Это про меня.<br><br><b>КОНЕЦ ВСЕХ ИСТОРИЙ</b>`;
+      
+      // Выдаем награду за прохождение
+      showAchievement("👑 Хранитель блокнота", "Вы прочитали всю историю и нашли секрет. Спасибо, что были с нами!");
+      
     } else {
-      p.caption = `<b>СЕКРЕТНАЯ ПАНЕЛЬ</b><br><br><i>Вы дочитали до конца. Вы знаете, что было дальше?</i><br><br><b>Егор:</b> — Тогда перечитай еще раз. Может, найдешь подсказки.<br><br><b>Равиль:</b> — Или просто пролистай до конца. Мы не обидимся.`;
+      p.caption = `<b>СЕКРЕТНАЯ ПАНЕЛЬ</b><br><br><b>Егор:</b> — Тогда перечитай еще раз. Может, найдешь подсказки.<br><br><b>Равиль:</b> — Или просто пролистай до конца. Мы не обидимся.`;
     }
     captionEl.innerHTML = p.caption;
   }
@@ -194,15 +235,15 @@
   });
   musicBtn.style.opacity = '0.5';
 
-    function render() {
+      function render() {
     const p = pages[current];
-    
-    // ВОТ ЭТА СТРОЧКА МЕНЯЕТ ФОН:
     document.getElementById('bg-container').style.backgroundImage = `url('${p.bg}')`;
-    
     changeTrack(p.theme);
     captionEl.classList.remove('visible');
     
+    // Проверяем достижения
+    checkAchievements(current);
+
     setTimeout(() => {
       captionEl.innerHTML = p.caption;
       captionEl.scrollTop = 0;
@@ -211,6 +252,41 @@
       prevBtn.disabled = current === 0;
       nextBtn.disabled = current === pages.length - 1;
     }, 150);
+  }
+
+  // ====== СИСТЕМА ДОСТИЖЕНИЙ ======
+  let achieved = [];
+
+  function showAchievement(title, desc) {
+    if (achieved.includes(title)) return; // Если уже получали, не показываем
+    achieved.push(title);
+    
+    const popup = document.getElementById('achievement-popup');
+    document.getElementById('ach-title').textContent = '🏆 Достижение: ' + title;
+    document.getElementById('ach-desc').textContent = desc;
+    
+    popup.classList.add('show');
+    setTimeout(() => {
+      popup.classList.remove('show');
+    }, 4000); // Исчезнет через 4 секунды
+  }
+
+  function checkAchievements(pageIndex) {
+    // Здесь мы привязываем достижения к номерам страниц (индексам)
+    // 0 - это первая страница, 5 - шестая и т.д.
+    
+    if (pageIndex === 4) { // Глава 5 Тома 1 (Маленькая победа)
+      showAchievement("Маленькая победа", "Равиль впервые не упомянул X4.");
+    }
+    if (pageIndex === 11) { // Том 2, Глава 5 (Переднее сиденье)
+      showAchievement("Первый поцелуй", "Они перестали играть роли.");
+    }
+    if (pageIndex === 17) { // Том 4, Глава 2 (Авария)
+      showAchievement("Это было больно", "Вы пережили аварию вместе с Равилем.");
+    }
+    if (pageIndex === 23) { // Том 5, Глава 5 (Разлука, которая не случилась)
+      showAchievement("Любовь — это риск", "Вы дочитали до финала.");
+    }
   }
    
     function go(delta) {
