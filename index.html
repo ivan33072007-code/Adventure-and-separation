@@ -46,19 +46,27 @@
     #music-panel { top: 10px; right: 10px; }
     #music-btn { width: 40px; height: 40px; }
     #volume-slider { width: 40px; height: 40px; margin: 35px 0; opacity: 1; pointer-events: auto; }
-     .choice-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: #fff;
-    padding: 10px 20px;
-    margin: 10px 5px;
-    border-radius: 8px;
+       .choice-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+  }
+
+  .choice-btn {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: #fff !important;
+    padding: 10px 20px !important;
+    border-radius: 8px !important;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 16px !important;
+    width: auto !important;
+    height: auto !important;
     transition: 0.2s;
   }
+  
   .choice-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.3) !important;
     transform: scale(1.05);
   }
 </style>
@@ -135,8 +143,10 @@
     { bg: "bg-final.jpg", theme: "calm2", caption: `<b>ФИНАЛЬНАЯ ПАНЕЛЬ (ТОМ 5)</b><br><br><i>Колледж. Равиль паркуется. Идеально, между линиями. Выходит. Из подъезда — Егор.</i><br><br><b>Равиль:</b> — Подвезти?<br><br><b>Егор:</b> — Мы живём в одном дворе.<br><br><b>Равиль:</b> — И что. Может, я хочу прокатить тебя. На переднем.<br><br><b>Егор</b> <i>(улыбаясь):</i> — Садись. Сегодня я за рулём.<br><br><b>Равиль:</b> — ЧТО?! Это МОЯ машина!<br><br><b>Егор:</b> — Пункт тридцать четыре: «Иногда нужно уступить руль, чтобы приключение продолжилось».<br><br><i>Егор за рулём. Равиль на пассажирском — впервые. Улыбается.</i><br><br><b>Равиль</b> <i>(закадровый):</i> — Adventure and separation. Приключение и разлука. Я думал, что это про то, как всё заканчивается. А оказалось — это про то, как всё начинается заново.<br><br><b>КОНЕЦ</b>` },
     { bg: "bg-final.jpg", theme: "calm2", caption: `<b>БОНУС-СЦЕНА</b><br><br><i>Нефёд всё-таки взорвал петарду во дворе. Паша его «порвал» (то есть отругал и купил мороженое). Арина послала Равиля нахуй ещё три раза — просто так, для профилактики. Миша вышел из «Нового быта» погулять с девушкой. Ваня сделал реп про X4. Егор дописал блокнот до конца. Равиль перестал считать, что деньги решают всё.</i><br><br><b>Пункт тридцать пятый:</b> «Он наконец понял, что самое ценное — не в машине».` },
     { bg: "bg.jpg", theme: "epic", caption: `<b>СЕКРЕТНАЯ ПАНЕЛЬ</b><br><br><i>Вы дочитали до конца. Вы знаете, что было дальше?</i><br><br>
-    <button class="choice-btn" onclick="chooseSecret('yes')">Да, конечно</button>
-    <button class="choice-btn" onclick="chooseSecret('no')">Нет, не знаю</button>` }
+    <div class="choice-container">
+      <button class="choice-btn" onclick="chooseSecret('yes')">Да, конечно</button>
+      <button class="choice-btn" onclick="chooseSecret('no')">Нет, не знаю</button>
+    </div>` }
   ];
   const captionEl = document.getElementById('caption');
   const counterEl = document.getElementById('counter');
