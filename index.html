@@ -8,20 +8,20 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; -webkit-tap-highlight-color: transparent; }
   
-  #bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #1a1a1a; background-size: cover; background-position: center; transition: background-image 0.8s ease-in-out; z-index: -2; }
-  #bg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: -1; }
+  #bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #1a1a1a; background-size: cover; background-position: center; transition: background-image 0.8s ease-in-out; z-index: -2; cursor: pointer; }
+  #bg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: -1; pointer-events: none; }
   
-  .book { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; gap: 12px; position: relative; z-index: 1; }
+  .book { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; gap: 12px; position: relative; z-index: 1; pointer-events: none; }
   .page { flex: 1; width: 100%; max-width: 900px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 0; }
   
-  .caption { color: #eee; font-size: clamp(14px, 3.5vw, 18px); text-align: left; width: 100%; max-width: 700px; line-height: 1.6; max-height: 75vh; overflow-y: auto; padding: 20px 24px; background: rgba(15, 15, 20, 0.8); border-radius: 12px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.6); opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; }
+  .caption { color: #eee; font-size: clamp(14px, 3.5vw, 18px); text-align: left; width: 100%; max-width: 700px; line-height: 1.6; max-height: 75vh; overflow-y: auto; padding: 20px 24px; background: rgba(15, 15, 20, 0.8); border-radius: 12px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.6); opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: auto; }
   .caption.visible { opacity: 1; transform: translateY(0); }
   .caption::-webkit-scrollbar { width: 6px; }
   .caption::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
   .caption b { color: #fff; }
   .caption i { color: #bbb; }
   
-  .controls { display: flex; align-items: center; gap: 24px; padding-bottom: env(safe-area-inset-bottom); flex-shrink: 0; opacity: 0.2; transition: opacity 0.3s; }
+  .controls { display: flex; align-items: center; gap: 24px; padding-bottom: env(safe-area-inset-bottom); flex-shrink: 0; opacity: 0.2; transition: opacity 0.3s; pointer-events: auto; }
   body:hover .controls, .controls:active { opacity: 1; }
   
   button { background: rgba(51, 51, 51, 0.8); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; width: 56px; height: 56px; font-size: 24px; cursor: pointer; user-select: none; transition: background 0.15s, transform 0.1s; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
@@ -40,22 +40,18 @@
   #volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
   #volume-slider::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 5px rgba(0,0,0,0.5); border: none; }
 
-  /* Кнопка достижений в углу */
   #ach-btn { position: absolute; top: 20px; left: 20px; width: 44px !important; height: 44px !important; padding: 0 !important; border-radius: 50% !important; background: rgba(30, 30, 30, 0.6) !important; border: 1px solid rgba(255,255,255,0.2) !important; color: #fff; font-size: 20px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
 
-  /* Окно достижений */
   #ach-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 50; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
   .ach-content { background: #1a1a1a; border: 2px solid #f1c40f; border-radius: 12px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; position: relative; }
   .ach-content h2 { color: #f1c40f; text-align: center; margin-bottom: 20px; font-size: 20px; }
   .ach-close { position: absolute; top: 15px; right: 15px; background: none !important; border: none !important; color: #aaa; font-size: 24px; cursor: pointer; width: auto !important; height: auto !important; padding: 0 !important; }
   
-  /* Всплывашка */
   #achievement-popup { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150%); background: rgba(15, 15, 20, 0.95); border: 2px solid #f1c40f; color: #fff; padding: 15px 30px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.8); z-index: 100; transition: transform 0.4s ease-in-out; text-align: center; backdrop-filter: blur(8px); }
   #achievement-popup.show { transform: translateX(-50%) translateY(0); }
   #achievement-popup h3 { margin: 0 0 5px 0; color: #f1c40f; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
   #achievement-popup p { margin: 0; font-size: 15px; color: #eee; }
 
-  /* Кнопки выбора в секрете */
   .choice-container { display: flex; gap: 15px; margin-top: 20px; }
   .choice-btn { background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; text-align: center; transition: 0.2s; user-select: none; }
   .choice-btn:hover { background: rgba(255, 255, 255, 0.3); transform: scale(1.05); }
@@ -72,7 +68,7 @@
 </head>
 <body>
 
-<div id="bg-container"></div>
+<div id="bg-container" onclick="clickBgEasterEgg()"></div>
 <div id="bg-overlay"></div>
 
 <button id="ach-btn" onclick="toggleAchievements()">🏆</button>
@@ -240,7 +236,8 @@
     { id: 2, title: "Первый поцелуй", desc: "Они перестали играть роли." },
     { id: 3, title: "Это было больно", desc: "Вы пережили аварию вместе с Равилем." },
     { id: 4, title: "Любовь — это риск", desc: "Вы дочитали до финала." },
-    { id: 5, title: "👑 Хранитель блокнота", desc: "Вы прочитали всю историю и нашли секрет." }
+    { id: 5, title: "👑 Хранитель блокнота", desc: "Вы прочитали всю историю и нашли секрет." },
+    { id: 6, title: "Любопытный нос", desc: "Вы кликнули на машину 5 раз." }
   ];
 
   let achieved = JSON.parse(localStorage.getItem('bookAchievements')) || [];
@@ -307,6 +304,37 @@
       p.caption = `<b>СЕКРЕТНАЯ ПАНЕЛЬ</b><br><br><b>Егор:</b> — Тогда перечитай еще раз. Может, найдешь подсказки.<br><br><b>Равиль:</b> — Или просто пролистай до конца. Мы не обидимся.`;
     }
     captionEl.innerHTML = p.caption;
+  }
+
+  // ====== ПАСХАЛКА НА ФОН ======
+  let clickCount = 0;
+
+  function clickBgEasterEgg() {
+    clickCount++;
+    
+    if (clickCount === 5) {
+      showAchievement("Любопытный нос", "Вы кликнули на фон 5 раз и нашли пасхалку!");
+      return;
+    }
+
+    const phrases = [
+      "Егор: — Равиль, перестань тыкать в мою машину!",
+      "Равиль: — Эй, аккуратнее, это X4! Два литра!",
+      "Егор: — Пункт тридцать семь: «Он кликает по машине, когда скучает».",
+      "Нефёд: — А если я сюда петарду кину?..",
+      "Равиль: — Если ты поцарапаешь экран, я тебя сам поцарапаю."
+    ];
+    
+    const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+    
+    const popup = document.getElementById('achievement-popup');
+    document.getElementById('ach-title').textContent = '🚘 Пасхалка';
+    document.getElementById('ach-desc').textContent = randomPhrase;
+    
+    popup.classList.add('show');
+    setTimeout(() => {
+      popup.classList.remove('show');
+    }, 3000);
   }
 
   // Запуск при загрузке
