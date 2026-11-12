@@ -15,10 +15,10 @@
   }
 
   body {
-    /* ФОН: картинка + затемнение для читаемости текста */
+    /* ТУТ МЫ УБРАЛИ ПАПКУ images/ */
     background-image: 
       linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
-      url('images/bg.jpg');
+      url('bg.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -67,7 +67,6 @@
     border: 1px solid rgba(255,255,255,0.1);
     box-shadow: 0 8px 32px rgba(0,0,0,0.5);
     
-    /* Анимация появления */
     opacity: 0;
     transform: translateY(10px);
     transition: opacity 0.3s ease, transform 0.3s ease;
@@ -144,7 +143,6 @@
 </div>
 
 <script>
-  // ==== СОДЕРЖИМОЕ КНИЖКИ ====
   const pages = [
     {
       caption: `<b>ГЛАВА 1. «Список, который всё изменил»</b><br>
@@ -233,32 +231,23 @@
   const pageEl = document.getElementById('page');
 
   let current = 0;
-
-  // ==== ЗВУК ПЕРЕЛИСТЫВАНИЯ ====
-  // Мы генерируем легкий звук "шороха" прямо в браузере, чтобы не искать аудиофайлы
   let audioCtx = null;
+  
   function playFlipSound() {
     try {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      
-      const bufferSize = audioCtx.sampleRate * 0.1; // 0.1 сек
+      const bufferSize = audioCtx.sampleRate * 0.1;
       const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       const data = buffer.getChannelData(0);
-      
-      // Генерируем белый шум
       for (let i = 0; i < bufferSize; i++) {
         data[i] = Math.random() * 2 - 1;
       }
-      
       const noise = audioCtx.createBufferSource();
       noise.buffer = buffer;
-      
-      // Фильтр, чтобы звук был мягким (как бумага)
       const filter = audioCtx.createBiquadFilter();
       filter.type = 'lowpass';
       filter.frequency.setValueAtTime(1000, audioCtx.currentTime);
       filter.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
-      
       const gain = audioCtx.createGain();
       gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
@@ -266,17 +255,12 @@
       noise.connect(filter);
       filter.connect(gain);
       gain.connect(audioCtx.destination);
-      
       noise.start();
-    } catch (e) {
-      console.log("Звук не поддерживается", e);
-    }
+    } catch (e) {}
   }
 
   function render() {
     const p = pages[current];
-    
-    // Скрываем текст перед сменой
     captionEl.classList.remove('visible');
     
     setTimeout(() => {
@@ -285,17 +269,14 @@
       counterEl.textContent = (current + 1) + " / " + pages.length;
       prevBtn.disabled = current === 0;
       nextBtn.disabled = current === pages.length - 1;
-      
-      // Показываем текст с анимацией
       captionEl.classList.add('visible');
-    }, 150); // Небольшая задержка, чтобы текст успел исчезнуть
+    }, 150);
   }
 
   function go(delta) {
     const next = current + delta;
     if (next < 0 || next >= pages.length) return;
-    
-    playFlipSound(); // Включаем звук
+    playFlipSound();
     current = next;
     render();
   }
@@ -319,14 +300,12 @@
     touchStartX = null;
   });
 
-  // Инициализация (сразу показываем первую страницу)
   if (pages.length === 0) {
     captionEl.textContent = "Добавь страницы в массив pages!";
   } else {
     captionEl.innerHTML = pages[0].caption;
     counterEl.textContent = "1 / " + pages.length;
     prevBtn.disabled = true;
-    // Даем браузеру чуть-чуть времени, чтобы анимация сработала при загрузке
     setTimeout(() => captionEl.classList.add('visible'), 100);
   }
 </script>
