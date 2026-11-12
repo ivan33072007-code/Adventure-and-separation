@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Книжка с картинками</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: #1a1a1a;
+    font-family: system-ui, -apple-system, sans-serif;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .book {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .page {
+    flex: 1;
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 0;            /* важно для скролла внутри flex */
+    transition: opacity 0.2s;
+  }
+
+  .page.fading { opacity: 0; }
+
+  .page img {
+    max-width: 100%;
+    max-height: 40vh;         /* картинка сверху, текст снизу */
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    background: #2a2a2a;
+    flex-shrink: 0;
+  }
+
+  .caption {
+    color: #eee;
+    font-size: clamp(14px, 3.5vw, 18px);
+    text-align: left;
+    width: 100%;
+    max-width: 700px;
+    line-height: 1.5;
+    max-height: 45vh;         /* чтобы не вылезало за экран */
+    overflow-y: auto;         /* прокрутка длинного текста */
+    padding-right: 6px;
+    flex-shrink: 1;
+  }
+
+  .caption::-webkit-scrollbar { width: 6px; }
+  .caption::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+
+  .caption b { color: #fff; }
+  .caption i { color: #aaa; }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding-bottom: env(safe-area-inset-bottom);
+    flex-shrink: 0;
+  }
+
+  button {
+    background: #333;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    font-size: 24px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  button:hover:not(:disabled) { background: #444; }
+  button:active:not(:disabled) { transform: scale(0.92); }
+  button:disabled { opacity: 0.3; cursor: default; }
+
+  .counter {
+    color: #888;
+    font-size: 14px;
+    min-width: 60px;
+    text-align: center;
+  }
+
+  @media (max-width: 600px) {
+    button { width: 48px; height: 48px; font-size: 20px; }
+    .page img { max-height: 32vh; }
+    .caption { max-height: 50vh; }
+  }
+</style>
+</head>
+<body>
+
+<div class="book">
+  <div class="page" id="page">
+    <img id="img" src="" alt="">
+    <div class="caption" id="caption"></div>
+  </div>
+
+  <div class="controls">
+    <button id="prev" aria-label="Назад">←</button>
+    <div class="counter" id="counter"></div>
+    <button id="next" aria-label="Вперёд">→</button>
+  </div>
+</div>
+
+<script>
+  // ==== СОДЕРЖИМОЕ КНИЖКИ ====
+  const pages = [
+    {
+      img: "images/01.jpg",
+      caption: `<b>ГЛАВА 1. «Список, который всё изменил»</b><br>
+      <i>Комната Егора. Ночь. На столе — тот самый блокнот. Равиль листает его, пока Егор спит на диване.</i><br><br>
+      <b>Равиль</b> <i>(шёпотом, читая):</i> — «Пункт семь: когда он смеётся, я забываю, что хотел написать»… Егор, ты серьёзно?<br><br>
+      <i>Крупный план — рука Егора во сне сжимает край пледа. Равиль смотрит на него дольше, чем собирался.</i><br><br>
+      <b>Равиль</b> <i>(про себя):</i> — Вот чёрт.`
+    },
+    {
+      img: "images/02.jpg",
+      caption: `<b>ГЛАВА 2. «Утро, которое стало другим»</b><br>
+      <i>Кухня. Егор в помятой футболке варит кофе. Равиль стоит в дверях, взъерошенный, без геля — впервые за весь том.</i><br><br>
+      <b>Егор</b> <i>(не оборачиваясь):</i> — Ты всю ночь читал мой блокнот?<br><br>
+      <b>Равиль</b> <i>(голос садится):</i> — Ты не спал?<br><br>
+      <b>Егор</b> <i>(поворачивается, кружка в руках):</i> — Спал. Просто чувствую, когда на меня смотрят. Особенно ты.<br><br>
+      <i>Пауза. Пар от кофе между ними. Равиль делает шаг.</i><br><br>
+      <b>Равиль:</b> — Егор. Пункт семь. Это про меня?<br><br>
+      <b>Егор</b> <i>(отводит взгляд, уши краснеют):</i> — Это про математику.<br><br>
+      <b>Равиль:</b> — В пункте семь написано «когда он смеётся». Математика не смеётся, Безбородов.<br><br>
+      <i>Егор ставит кружку. Слишком резко. Кофе плещется.</i>`
+    },
+    {
+      img: "images/03.jpg",
+      caption: `<b>ГЛАВА 3. «X4 как предлог»</b><br>
+      <i>BMW стоит во дворе. Равиль крутит ключи на пальце.</i><br><br>
+      <b>Равиль</b> <i>(стараясь звучать буднично):</i> — Подвезти?<br><br>
+      <b>Егор:</b> — Мы живём в одном дворе.<br><br>
+      <b>Равиль:</b> — Ну и что. Может, я хочу прокатить тебя. На переднем сиденье.<br><br>
+      <i>Егор замирает. Смотрит на него.</i><br><br>
+      <b>Егор:</b> — Равиль. Ты два месяца сажал туда только себя и свои понты.<br><br>
+      <b>Равиль</b> <i>(тихо):</i> — А теперь хочу тебя.<br><br>
+      <i>Лицо Егора. Глаза расширяются. Он открывает рот, закрывает.</i><br><br>
+      <b>Егор:</b> — …Ты это сейчас серьёзно сказал?<br><br>
+      <b>Равиль</b> <i>(краснеет, отворачивается):</i> — Забей. Садись уже.<br><br>
+      <i>Егор садится. Впервые — не потому что деваться некуда.</i>`
+    },
+    {
+      img: "images/04.jpg",
+      caption: `<b>ГЛАВА 4. «Ночная трасса»</b><br>
+      <i>Пустая дорога, огни города. Музыка тихо. Равиль ведёт одной рукой. Егор смотрит в окно, потом на него.</i><br><br>
+      <b>Егор:</b> — Ты знаешь, почему я вообще сел в эту машину в первый раз?<br><br>
+      <b>Равиль:</b> — Потому что я тебя заставил?<br><br>
+      <b>Егор</b> <i>(усмехается):</i> — Потому что ты ждал меня у подъезда сорок минут. И делал вид, что просто мимо проезжал.<br><br>
+      <i>Равиль резко тормозит на светофоре. Поворачивается.</i><br><br>
+      <b>Равиль:</b> — Ты знал?<br><br>
+      <b>Егор:</b> — Я всё знаю. Я же веду блокнот.<br><br>
+      <i>Они смотрят друг на друга. Красный свет. Никто не торопится ехать.</i><br><br>
+      <b>Егор</b> <i>(тише):</i> — Пункт двенадцать. «Он смотрит на меня, когда думает, что я не вижу». Я вижу, Равиль.`
+    },
+    {
+      img: "images/05.jpg",
+      caption: `<b>ГЛАВА 5. «Переднее сиденье»</b><br>
+      <i>Машина припаркована у дома. Двигатель заглушён. Тишина. Равиль сжимает руль.</i><br><br>
+      <b>Равиль:</b> — Егор. Я не знаю, как это делается. Я умею только понтоваться. Скажи мне, что делать.<br><br>
+      <b>Егор</b> <i>(отстёгивает ремень, поворачивается к нему):</i> — Не понтуйся. Просто будь.<br><br>
+      <i>Равиль медленно убирает руку с руля. Поворачивается. Их лица близко.</i><br><br>
+      <b>Равиль</b> <i>(шёпотом):</i> — Я боюсь, что ты сейчас скажешь «это шутка».<br><br>
+      <b>Егор:</b> — Это не шутка.<br><br>
+      <i>Егор первым тянется. Целует — коротко, неуверенно, как будто проверяет, не оттолкнут ли. Равиль замирает на секунду. Потом отвечает — уже без понтов, без геля, без «у меня X4». Просто Равиль.</i><br><br>
+      <i>За окном — двор, фонарь, тишина. В машине — двое, которые наконец перестали играть роли.</i>`
+    },
+    {
+      img: "images/06.jpg",
+      caption: `<b>ГЛАВА 6. «Диплом»</b><br>
+      <i>Утро. Кухня Егора. Равиль в его футболке пьёт кофе. На столе — блокнот. Егор дописывает последнюю страницу.</i><br><br>
+      <b>Равиль</b> <i>(зевая):</i> — Что пишешь?<br><br>
+      <b>Егор:</b> — Заключение. «Вывод: пациент безнадёжен. Но я его вылечил».<br><br>
+      <b>Равиль</b> <i>(поперхнулся):</i> — Ты… ты серьёзно вставил меня в диплом?!<br><br>
+      <b>Егор</b> <i>(ухмыляется):</i> — Глава десять. «Метод лечения: совместные поездки на X4 и честные разговоры». Оценка — отлично.<br><br>
+      <i>Равиль тянется через стол, хватает Егора за футболку, притягивает.</i><br><br>
+      <b>Равиль:</b> — А за «пациента» я тебе сейчас устрою.<br><br>
+      <i>Поцелуй. Блокнот падает на пол. Кофе остывает.</i><br><br>
+      <b>Егор</b> <i>(между поцелуями):</i> — Пункт тринадцать… «он целуется лучше, чем паркуется»…<br><br>
+      <b>Равиль:</b> — Заткнись, Безбородов.`
+    },
+    {
+      img: "images/07.jpg",
+      caption: `<b>ФИНАЛЬНАЯ ПАНЕЛЬ</b><br>
+      <i>BMW у колледжа. Из машины выходят двое. Равиль — без очков. Егор — с блокнотом под мышкой. Проходящая девушка оборачивается на машину.</i><br><br>
+      <b>Девушка:</b> — О, у тебя X4? Круто!<br><br>
+      <b>Равиль</b> <i>(берёт Егора за руку):</i> — Ага. И самый крутой пассажир. Пойдём, Егор.<br><br>
+      <i>Егор улыбается. Первый раз за весь том — открыто, не пряча.</i><br><br>
+      <b>Егор</b> <i>(закадровый):</i> — Пункт четырнадцатый. «Он наконец назвал меня пассажиром. Не другом. Не соседом. Пассажиром переднего сиденья». Это лучшее, что было в моём дипломе.<br><br>
+      <b>КОНЕЦ ВТОРОГО ТОМА</b>`
+    }
+  ];
+
+  const imgEl = document.getElementById('img');
+  const captionEl = document.getElementById('caption');
+  const counterEl = document.getElementById('counter');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  const pageEl = document.getElementById('page');
+
+  let current = 0;
+
+  function render() {
+    const p = pages[current];
+    imgEl.src = p.img;
+    imgEl.alt = "Страница " + (current + 1);
+    captionEl.innerHTML = p.caption || '';
+    captionEl.scrollTop = 0;   // при смене страницы текст с начала
+    counterEl.textContent = (current + 1) + " / " + pages.length;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === pages.length - 1;
+    imgEl.onerror = () => { imgEl.style.visibility = 'hidden'; };
+    imgEl.onload = () => { imgEl.style.visibility = 'visible'; };
+  }
+
+  function go(delta) {
+    const next = current + delta;
+    if (next < 0 || next >= pages.length) return;
+    current = next;
+    render();
+  }
+
+  prevBtn.addEventListener('click', () => go(-1));
+  nextBtn.addEventListener('click', () => go(1));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') go(-1);
+    if (e.key === 'ArrowRight') go(1);
+  });
+
+  let touchStartX = null;
+  pageEl.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+  pageEl.addEventListener('touchend', (e) => {
+    if (touchStartX === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
+    touchStartX = null;
+  });
+
+  if (pages.length === 0) {
+    captionEl.textContent = "Добавь страницы в массив pages!";
+  } else {
+    render();
+  }
+</script>
+</body>
+</html>
